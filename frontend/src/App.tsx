@@ -49,21 +49,21 @@ function App() {
         <div className="w-full max-w-2xl mx-auto px-6 py-12 pb-24">
           {/* Search Section */}
           <div className="w-full">
-            {/* Title - Only show when no query */}
-            {!query && (
-              <div className="text-center mb-8">
-                <h1 className="text-4xl sm:text-5xl font-bold mb-3">
-                  <span className="text-red-500">Gian</span>{' '}
-                  <span className="text-white">Geralcus</span>
-                </h1>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-3">
-                  <span className="text-cyan-400">HS Code</span>
-                </h2>
+            {/* Title - Always visible */}
+            <div className="text-center mb-6">
+              <h1 className={`font-bold mb-2 ${query ? 'text-2xl sm:text-3xl' : 'text-4xl sm:text-5xl'} transition-all`}>
+                <span className="text-red-500">Gian</span>{' '}
+                <span className="text-white">Geralcus</span>
+              </h1>
+              <h2 className={`font-bold mb-2 ${query ? 'text-2xl sm:text-3xl' : 'text-4xl sm:text-5xl'} transition-all`}>
+                <span className="text-cyan-400">HS Code</span>
+              </h2>
+              {!query && (
                 <p className="text-white/50 text-sm">
                   Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia
                 </p>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Search Input */}
             <div className="w-full">
@@ -129,15 +129,34 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 w-full py-4 text-center bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 z-20">
-        <div className="w-full max-w-4xl mx-auto px-6">
-          <p className="text-xs text-white/30">
-            Built by{' '}
+      <footer className="fixed bottom-0 left-0 right-0 w-full py-4 bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 z-20">
+        <div className="flex flex-col items-center justify-center gap-1">
+          <p className="text-xs text-white/30 text-center">
+            © 2026{' '}
             <a href="https://github.com/giangeralcus" className="text-white/50 hover:text-cyan-400 transition-colors">
               Gian Geralcus
             </a>
             {' · '}Licensed Customs Broker
           </p>
+          <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/giangeralcus"
+              className="text-xs text-white/20 hover:text-cyan-400 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              GitHub
+            </a>
+            <span className="text-white/10">·</span>
+            <a
+              href="https://linkedin.com/in/giangeralcus"
+              className="text-xs text-white/20 hover:text-cyan-400 transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              LinkedIn
+            </a>
+          </div>
         </div>
       </footer>
 
