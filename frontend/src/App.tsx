@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Search, Box } from 'lucide-react'
+import { Search, Box, History } from 'lucide-react'
 import './index.css'
 import { HSCodeSearch } from './components/HSCodeSearch'
 import { SearchResults } from './components/SearchResults'
@@ -36,123 +36,109 @@ function App() {
   }, [search])
 
   return (
-    <div className="min-h-screen bg-[#08080c] text-white relative overflow-hidden">
-      {/* Background Gradient Orbs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[100px]" />
+    <div className="min-h-screen w-full bg-[#0a0a0f] text-white flex flex-col">
+      {/* Background Gradient */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px]" />
       </div>
 
-      {/* Header */}
-      <header className="relative border-b border-white/5">
-        <div className="max-w-3xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-white/5 border border-white/10">
-                <Box className="w-5 h-5 text-cyan-400" />
-              </div>
-              <div>
-                <h1 className="text-lg font-medium tracking-tight">
-                  HS Code <span className="text-cyan-400">Indonesia</span>
-                </h1>
-                <p className="text-xs text-white/40">BTKI 2022</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-white/40">
-              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              <span>14,999 kode aktif</span>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
-      <main className="relative max-w-3xl mx-auto px-6 py-12">
-        {/* Hero Text */}
-        {!query && (
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
-              Cari <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Kode HS</span>
-            </h2>
-            <p className="text-white/50 text-sm max-w-md mx-auto">
-              Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia
-            </p>
-          </div>
-        )}
+      <main className="relative flex-1 w-full flex items-center justify-center">
+        <div className="w-full max-w-2xl mx-auto px-6 py-12 pb-24">
+          {/* Search Section */}
+          <div className="w-full">
+            {/* Title - Only show when no query */}
+            {!query && (
+              <div className="text-center mb-8">
+                <h1 className="text-4xl sm:text-5xl font-bold mb-3">
+                  <span className="text-red-500">Gian</span>{' '}
+                  <span className="text-white">Geralcus</span>
+                </h1>
+                <h2 className="text-4xl sm:text-5xl font-bold mb-3">
+                  <span className="text-cyan-400">HS Code</span>
+                </h2>
+                <p className="text-white/50 text-sm">
+                  Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia
+                </p>
+              </div>
+            )}
 
-        {/* Search */}
-        <HSCodeSearch
-          value={query}
-          onChange={handleSearch}
-          onClear={handleClear}
-          isLoading={isLoading}
-        />
-
-        {/* Error */}
-        {error && (
-          <div className="mt-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-        )}
-
-        {/* Recent Searches */}
-        {!query && recentSearches.length > 0 && (
-          <div className="mt-10">
-            <RecentSearches
-              searches={recentSearches}
-              onSelect={handleRecentSearch}
-              onRemove={removeSearch}
-              onClearAll={clearAll}
-            />
-          </div>
-        )}
-
-        {/* Results */}
-        {query && (
-          <div className="mt-8">
-            <SearchResults
-              results={results}
-              query={query}
-              isLoading={isLoading}
-              onSelectCode={handleSelectCode}
-            />
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!query && recentSearches.length === 0 && (
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 mb-5">
-              <Search className="w-6 h-6 text-white/30" />
+            {/* Search Input */}
+            <div className="w-full">
+              <HSCodeSearch
+                value={query}
+                onChange={handleSearch}
+                onClear={handleClear}
+                isLoading={isLoading}
+              />
             </div>
-            <p className="text-white/40 text-sm mb-6">
-              Ketik nama produk atau kode HS
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {['coffee', 'footwear', 'laptop', 'textile'].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => handleSearch(item)}
-                  className="px-4 py-2 text-sm text-white/60 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:text-white transition-all"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+
+            {/* Quick Search - Only when no query */}
+            {!query && (
+              <div className="w-full flex flex-wrap items-center justify-center gap-2 mt-4">
+                {['coffee', 'footwear', 'laptop', 'textile'].map((item) => (
+                  <button
+                    key={item}
+                    onClick={() => handleSearch(item)}
+                    className="px-3 py-1.5 text-sm text-white/50 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:text-white/70 transition-all"
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+
+          {/* Error */}
+          {error && (
+            <div className="w-full mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+              <p className="text-sm text-red-400">{error}</p>
+            </div>
+          )}
+
+          {/* Results */}
+          {query && (
+            <div className="w-full mt-8">
+              <SearchResults
+                results={results}
+                query={query}
+                isLoading={isLoading}
+                onSelectCode={handleSelectCode}
+              />
+            </div>
+          )}
+
+          {/* Recent Searches - Only when no query and has history */}
+          {!query && recentSearches.length > 0 && (
+            <div className="w-full mt-10">
+              <div className="flex items-center gap-2 mb-4 text-sm text-white/40">
+                <History className="w-4 h-4" />
+                <span>Pencarian Terakhir</span>
+              </div>
+              <RecentSearches
+                searches={recentSearches}
+                onSelect={handleRecentSearch}
+                onRemove={removeSearch}
+                onClearAll={clearAll}
+              />
+            </div>
+          )}
+        </div>
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 py-4 text-center border-t border-white/5 bg-[#08080c]/80 backdrop-blur-sm">
-        <p className="text-xs text-white/30">
-          Built by{' '}
-          <a href="https://github.com/giangeralcus" className="text-white/50 hover:text-cyan-400 transition-colors">
-            Gian Geralcus
-          </a>
-          <span className="mx-2 text-white/20">|</span>
-          Licensed Customs Broker
-        </p>
+      <footer className="fixed bottom-0 left-0 right-0 w-full py-4 text-center bg-[#0a0a0f]/90 backdrop-blur-sm border-t border-white/5 z-20">
+        <div className="w-full max-w-4xl mx-auto px-6">
+          <p className="text-xs text-white/30">
+            Built by{' '}
+            <a href="https://github.com/giangeralcus" className="text-white/50 hover:text-cyan-400 transition-colors">
+              Gian Geralcus
+            </a>
+            {' · '}Licensed Customs Broker
+          </p>
+        </div>
       </footer>
 
       {/* Modal */}
