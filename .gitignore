@@ -27,3 +27,8 @@ data/*.json
 
 # Supabase
 .supabase/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
