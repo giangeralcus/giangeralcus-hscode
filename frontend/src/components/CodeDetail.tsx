@@ -80,17 +80,21 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      style={{ animation: 'fadeIn 0.2s ease-out' }}
     >
-      <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
+        style={{ animation: 'scaleIn 0.2s ease-out' }}
+      >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-gradient-to-r from-white to-blue-50/50 border-b border-gray-100 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span id="modal-title" className="font-mono text-2xl font-bold text-blue-600">
+            <span id="modal-title" className="font-mono text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               {code.code_formatted || code.code}
             </span>
             <button
@@ -194,10 +198,22 @@ function TariffItem({ label, value, defaultValue }: { label: string; value: numb
     return null
   }
 
+  const isZero = displayValue === 0
+
   return (
-    <div className="bg-gray-50 rounded-lg px-3 py-2">
-      <span className="text-xs text-gray-500">{label}</span>
-      <span className="block text-lg font-semibold text-gray-800">{displayValue}%</span>
+    <div className={cn(
+      "rounded-xl px-3 py-2.5 border transition-colors",
+      isZero
+        ? "bg-green-50 border-green-200"
+        : "bg-gray-50 border-gray-100"
+    )}>
+      <span className="text-xs text-gray-500 font-medium">{label}</span>
+      <span className={cn(
+        "block text-lg font-bold",
+        isZero ? "text-green-600" : "text-gray-800"
+      )}>
+        {displayValue}%
+      </span>
     </div>
   )
 }
