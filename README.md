@@ -96,7 +96,7 @@ GET /rest/v1/hs_lartas?hs_code=eq.64041100
 ## Struktur Folder
 
 ```
-hs-code-indonesia/
+giangeralcus-hscode/
 ├── frontend/             # React frontend app
 │   ├── src/
 │   │   ├── components/   # React components
