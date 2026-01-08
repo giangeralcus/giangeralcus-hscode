@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 1010,
-    strictPort: true, // Fail if port is already in use
+    strictPort: true,
   },
 })

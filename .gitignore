@@ -35,3 +35,9 @@ frontend/dist/
 frontend/.env
 *.chm
 contoh/
+
+# E-BTKI extracted data (large files)
+data/btki-extracted/
+data/btki_2022_extracted.csv
+data/btki_2022_extracted.json
+data/update_descriptions.sql
