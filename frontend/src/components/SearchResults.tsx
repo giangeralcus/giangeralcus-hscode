@@ -1,4 +1,4 @@
-import { Copy, Check, ChevronRight, FileSearch } from 'lucide-react'
+import { Copy, Check, ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import type { HSCodeResult } from '../hooks/useHSSearch'
 import { cn, copyToClipboard } from '../lib/utils'
@@ -12,23 +12,13 @@ interface SearchResultsProps {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-gray-100 rounded-xl p-4 animate-pulse">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-6 w-28 bg-gray-200 rounded-lg"></div>
-            <div className="h-6 w-6 bg-gray-100 rounded-md"></div>
-          </div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-100 rounded w-full"></div>
-            <div className="h-4 bg-gray-100 rounded w-3/4"></div>
-          </div>
-          <div className="flex gap-4 mt-3">
-            <div className="h-3 w-16 bg-gray-100 rounded"></div>
-            <div className="h-3 w-20 bg-gray-100 rounded"></div>
-          </div>
+    <div className="p-4 rounded-xl bg-white/5 border border-white/5 animate-pulse">
+      <div className="flex justify-between items-start">
+        <div className="space-y-3 flex-1">
+          <div className="h-5 w-24 bg-white/10 rounded" />
+          <div className="h-4 w-full bg-white/5 rounded" />
+          <div className="h-4 w-2/3 bg-white/5 rounded" />
         </div>
-        <div className="h-5 w-5 bg-gray-100 rounded"></div>
       </div>
     </div>
   )
@@ -46,13 +36,12 @@ export function SearchResults({ results, query, isLoading = false, onSelectCode 
     }
   }
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-gray-500 mb-4 flex items-center gap-2">
-          <span className="inline-block h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></span>
-          Mencari "{query}"...
+        <p className="text-sm text-white/40 flex items-center gap-2">
+          <span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          Searching...
         </p>
         <SkeletonCard />
         <SkeletonCard />
@@ -61,124 +50,83 @@ export function SearchResults({ results, query, isLoading = false, onSelectCode 
     )
   }
 
-  // No results
   if (results.length === 0 && query.length >= 2) {
     return (
-      <div className="text-center py-16">
-        <div className="relative inline-block mb-4">
-          <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-5 rounded-2xl border border-orange-100">
-            <FileSearch className="h-10 w-10 text-orange-400" />
-          </div>
-        </div>
-        <p className="text-lg font-medium text-gray-700">Tidak ada hasil untuk "{query}"</p>
-        <p className="text-sm text-gray-500 mt-1">Coba kata kunci lain atau periksa ejaan</p>
-        <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <span className="text-xs text-gray-400">Tips:</span>
-          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">Gunakan kata dalam bahasa Inggris</span>
-          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600">Coba 4-digit kode HS</span>
-        </div>
+      <div className="text-center py-12">
+        <p className="text-white/50">No results for "{query}"</p>
+        <p className="text-sm text-white/30 mt-1">Try a different keyword</p>
       </div>
     )
   }
 
-  if (results.length === 0) {
-    return null
-  }
+  if (results.length === 0) return null
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-500">
-          <span className="font-semibold text-gray-700">{results.length}</span> hasil untuk "{query}"
-        </p>
-        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
-          Klik untuk detail
-        </span>
-      </div>
+      <p className="text-sm text-white/40">
+        <span className="text-white/60 font-medium">{results.length}</span> results
+      </p>
 
-      {results.map((result, index) => (
-        <div
-          key={result.code}
-          onClick={() => onSelectCode(result)}
-          className={cn(
-            "bg-white border border-gray-100 rounded-xl p-4",
-            "hover:border-blue-200 hover:shadow-lg hover:shadow-blue-100/50",
-            "cursor-pointer transition-all duration-200",
-            "group relative overflow-hidden"
-          )}
-          style={{
-            animationDelay: `${index * 50}ms`,
-            animation: 'fadeInUp 0.3s ease-out forwards'
-          }}
-        >
-          {/* Subtle gradient overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-50/0 to-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-          <div className="relative flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="font-mono text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  {result.code_formatted || result.code}
-                </span>
-
-                <button
-                  onClick={(e) => handleCopy(result.code, e)}
-                  className={cn(
-                    "p-1.5 rounded-lg transition-all duration-200",
-                    "hover:bg-gray-100 text-gray-400 hover:text-gray-600",
-                    "hover:scale-110",
-                    copiedCode === result.code && "text-green-500 hover:text-green-500 bg-green-50"
-                  )}
-                  title="Copy HS code"
-                >
-                  {copiedCode === result.code ? (
-                    <Check className="h-4 w-4" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </button>
-
-                {result.level && (
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
-                    {result.level}-digit
-                  </span>
-                )}
-              </div>
-
-              <p className="text-gray-700 line-clamp-2 leading-relaxed">
-                {result.description_id}
-              </p>
-
-              {result.description_en && result.description_en !== result.description_id && (
-                <p className="text-gray-500 text-sm mt-1.5 line-clamp-1 italic">
-                  {result.description_en}
-                </p>
-              )}
-            </div>
-
-            <div className="flex-shrink-0 mt-1 p-1.5 rounded-lg bg-gray-50 group-hover:bg-blue-100 transition-colors">
-              <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
-            </div>
-          </div>
-
-          <div className="relative flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
-            <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2 py-1 rounded-md">
-              Chapter {result.chapter}
-            </span>
-            {result.similarity > 0 && (
-              <div className="flex items-center gap-1.5">
-                <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full"
-                    style={{ width: `${Math.round(result.similarity * 100)}%` }}
-                  />
-                </div>
-                <span className="text-xs text-gray-500">{Math.round(result.similarity * 100)}%</span>
-              </div>
+      <div className="space-y-2">
+        {results.map((result) => (
+          <div
+            key={result.code}
+            onClick={() => onSelectCode(result)}
+            className={cn(
+              "group p-4 rounded-xl cursor-pointer transition-all duration-200",
+              "bg-white/[0.03] border border-white/5",
+              "hover:bg-white/[0.06] hover:border-white/10"
             )}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                {/* Code */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-mono text-cyan-400 font-medium">
+                    {result.code_formatted || result.code}
+                  </span>
+                  <button
+                    onClick={(e) => handleCopy(result.code, e)}
+                    className={cn(
+                      "p-1 rounded transition-all",
+                      "text-white/20 hover:text-white/60 hover:bg-white/10",
+                      copiedCode === result.code && "text-emerald-400"
+                    )}
+                  >
+                    {copiedCode === result.code ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                  {result.level && (
+                    <span className="text-[10px] text-white/30 px-1.5 py-0.5 rounded bg-white/5">
+                      {result.level}-digit
+                    </span>
+                  )}
+                </div>
+
+                {/* Description */}
+                <p className="text-sm text-white/70 line-clamp-2 leading-relaxed">
+                  {result.description_id}
+                </p>
+
+                {/* Meta */}
+                <div className="flex items-center gap-3 mt-3 text-xs text-white/30">
+                  <span>Chapter {result.chapter}</span>
+                  {result.similarity > 0 && (
+                    <span className="text-emerald-400/70">
+                      {Math.round(result.similarity * 100)}% match
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <ArrowRight className="w-4 h-4 text-white/10 group-hover:text-white/30 group-hover:translate-x-0.5 transition-all flex-shrink-0 mt-1" />
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

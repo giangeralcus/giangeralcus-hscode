@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Search, Package, Sparkles } from 'lucide-react'
+import { Search, Box } from 'lucide-react'
 import './index.css'
 import { HSCodeSearch } from './components/HSCodeSearch'
 import { SearchResults } from './components/SearchResults'
@@ -27,7 +27,6 @@ function App() {
 
   const handleSelectCode = useCallback((code: HSCodeResult) => {
     setSelectedCode(code)
-    // Add to recent searches
     addSearch(query, code.code, code.description_id.slice(0, 50))
   }, [addSearch, query])
 
@@ -37,73 +36,68 @@ function App() {
   }, [search])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-[#08080c] text-white relative overflow-hidden">
+      {/* Background Gradient Orbs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[100px]" />
+      </div>
+
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-3xl mx-auto px-4 py-4">
+      <header className="relative border-b border-white/5">
+        <div className="max-w-3xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl blur-sm opacity-75"></div>
-                <div className="relative p-2.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                  <Package className="h-5 w-5 text-white" />
-                </div>
+              <div className="p-2 rounded-lg bg-white/5 border border-white/10">
+                <Box className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                  HS Code Indonesia
+                <h1 className="text-lg font-medium tracking-tight">
+                  HS Code <span className="text-cyan-400">Indonesia</span>
                 </h1>
-                <p className="text-xs text-gray-500 font-medium">BTKI 2022 - Pencarian Kode HS</p>
+                <p className="text-xs text-white/40">BTKI 2022</p>
               </div>
             </div>
-            <div className="hidden sm:flex items-center gap-1.5 text-xs bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 px-3 py-1.5 rounded-full border border-green-200">
-              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="font-medium">14,999 Kode</span>
+            <div className="flex items-center gap-2 text-xs text-white/40">
+              <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <span>14,999 kode aktif</span>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-8 pb-24">
-        {/* Hero Section when no query */}
+      <main className="relative max-w-3xl mx-auto px-6 py-12">
+        {/* Hero Text */}
         {!query && (
-          <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Cari Kode HS dengan Mudah
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight mb-3">
+              Cari <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Kode HS</span>
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base">
-              Ketik nama barang atau kode HS untuk menemukan klasifikasi yang tepat
+            <p className="text-white/50 text-sm max-w-md mx-auto">
+              Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia
             </p>
           </div>
         )}
 
         {/* Search */}
-        <div className="mb-8">
-          <HSCodeSearch
-            value={query}
-            onChange={handleSearch}
-            onClear={handleClear}
-            isLoading={isLoading}
-          />
-        </div>
+        <HSCodeSearch
+          value={query}
+          onChange={handleSearch}
+          onClear={handleClear}
+          isLoading={isLoading}
+        />
 
-        {/* Error Message */}
+        {/* Error */}
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 flex items-start gap-3">
-            <div className="p-1 bg-red-100 rounded-lg">
-              <Search className="h-4 w-4 text-red-500" />
-            </div>
-            <div>
-              <p className="font-medium">Terjadi kesalahan</p>
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
+          <div className="mt-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
-        {/* Recent Searches (show when no query) */}
+        {/* Recent Searches */}
         {!query && recentSearches.length > 0 && (
-          <div className="mb-6">
+          <div className="mt-10">
             <RecentSearches
               searches={recentSearches}
               onSelect={handleRecentSearch}
@@ -115,35 +109,31 @@ function App() {
 
         {/* Results */}
         {query && (
-          <SearchResults
-            results={results}
-            query={query}
-            isLoading={isLoading}
-            onSelectCode={handleSelectCode}
-          />
+          <div className="mt-8">
+            <SearchResults
+              results={results}
+              query={query}
+              isLoading={isLoading}
+              onSelectCode={handleSelectCode}
+            />
+          </div>
         )}
 
-        {/* Empty State (no query, no recent) */}
+        {/* Empty State */}
         {!query && recentSearches.length === 0 && (
-          <div className="text-center py-12">
-            <div className="relative inline-block mb-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-3xl blur-xl opacity-50"></div>
-              <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-3xl border border-blue-100">
-                <Search className="h-12 w-12 text-blue-500" />
-              </div>
+          <div className="mt-16 text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/5 border border-white/10 mb-5">
+              <Search className="w-6 h-6 text-white/30" />
             </div>
-            <div className="space-y-2">
-              <p className="text-lg font-semibold text-gray-700">Mulai Pencarian</p>
-              <p className="text-sm text-gray-500 max-w-xs mx-auto">
-                Ketik nama produk seperti "sepatu", "laptop", atau masukkan kode HS langsung
-              </p>
-            </div>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              {['sepatu', 'laptop', 'tekstil', 'elektronik'].map((item) => (
+            <p className="text-white/40 text-sm mb-6">
+              Ketik nama produk atau kode HS
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {['coffee', 'footwear', 'laptop', 'textile'].map((item) => (
                 <button
                   key={item}
                   onClick={() => handleSearch(item)}
-                  className="px-4 py-2 text-sm bg-white border border-gray-200 rounded-full text-gray-600 hover:border-blue-300 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-sm"
+                  className="px-4 py-2 text-sm text-white/60 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 hover:text-white transition-all"
                 >
                   {item}
                 </button>
@@ -154,21 +144,18 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-200/50 py-3">
-        <div className="max-w-3xl mx-auto px-4">
-          <p className="text-xs text-gray-500 text-center flex items-center justify-center gap-1.5">
-            <Sparkles className="h-3 w-3 text-amber-500" />
-            <span>Built by</span>
-            <a href="https://github.com/giangeralcus" className="font-medium text-blue-600 hover:text-blue-700 hover:underline">
-              Gian Geralcus
-            </a>
-            <span className="text-gray-400">|</span>
-            <span>Licensed Customs Broker</span>
-          </p>
-        </div>
+      <footer className="fixed bottom-0 left-0 right-0 py-4 text-center border-t border-white/5 bg-[#08080c]/80 backdrop-blur-sm">
+        <p className="text-xs text-white/30">
+          Built by{' '}
+          <a href="https://github.com/giangeralcus" className="text-white/50 hover:text-cyan-400 transition-colors">
+            Gian Geralcus
+          </a>
+          <span className="mx-2 text-white/20">|</span>
+          Licensed Customs Broker
+        </p>
       </footer>
 
-      {/* Code Detail Modal */}
+      {/* Modal */}
       {selectedCode && (
         <CodeDetail
           code={selectedCode}

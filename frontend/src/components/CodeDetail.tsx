@@ -23,13 +23,9 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   const [tariff, setTariff] = useState<TariffData | null>(null)
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
-  // Handle Escape key
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose()
-    }
+    if (e.key === 'Escape') onClose()
   }, [onClose])
 
   useEffect(() => {
@@ -40,27 +36,19 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   useEffect(() => {
     const fetchTariff = async () => {
       setLoading(true)
-      setError(null)
       try {
-        const { data, error: fetchError } = await supabase
+        const { data } = await supabase
           .from('hs_tariffs')
           .select('bm_mfn, ppn, pph_api, pph_non_api, bm_atiga, bm_acfta, bm_rcep')
           .eq('hs_code', code.code)
           .single()
-
-        if (fetchError && fetchError.code !== 'PGRST116') {
-          // PGRST116 = no rows returned (not an error for us)
-          throw fetchError
-        }
         setTariff(data)
-      } catch (err) {
-        console.error('Failed to fetch tariff:', err)
-        setError('Gagal memuat data tarif')
+      } catch {
+        // No tariff data available
       } finally {
         setLoading(false)
       }
     }
-
     fetchTariff()
   }, [code.code])
 
@@ -73,49 +61,37 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose()
-    }
+    if (e.target === e.currentTarget) onClose()
   }
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
       onClick={handleBackdropClick}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      style={{ animation: 'fadeIn 0.2s ease-out' }}
     >
-      <div
-        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-100"
-        style={{ animation: 'scaleIn 0.2s ease-out' }}
-      >
+      <div className="bg-[#0c0c10] border border-white/10 rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-white to-blue-50/50 border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-[#0c0c10] border-b border-white/5 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span id="modal-title" className="font-mono text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="font-mono text-xl font-semibold text-cyan-400">
               {code.code_formatted || code.code}
             </span>
             <button
               onClick={handleCopy}
               className={cn(
-                "p-2 rounded-lg transition-colors",
-                "hover:bg-gray-100",
-                copied ? "text-green-500" : "text-gray-400 hover:text-gray-600"
+                "p-1.5 rounded-lg transition-all",
+                "hover:bg-white/10",
+                copied ? "text-emerald-400" : "text-white/40 hover:text-white/60"
               )}
-              title="Copy HS code"
-              aria-label={copied ? "Copied!" : "Copy HS code"}
             >
-              {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
+              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label="Close modal"
+            className="p-2 rounded-lg hover:bg-white/10 text-white/40 hover:text-white/60 transition-all"
           >
-            <X className="h-5 w-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -123,66 +99,54 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
         <div className="p-6 space-y-6">
           {/* Description */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Deskripsi (ID)</h3>
-            <p className="text-gray-800">{code.description_id}</p>
+            <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-2">Description</h3>
+            <p className="text-white/80 leading-relaxed">{code.description_id}</p>
+            {code.description_en && code.description_en !== code.description_id && (
+              <p className="text-white/50 text-sm mt-2 italic">{code.description_en}</p>
+            )}
           </div>
-
-          {code.description_en && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Description (EN)</h3>
-              <p className="text-gray-600">{code.description_en}</p>
-            </div>
-          )}
 
           {/* Hierarchy */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Chapter</h3>
-              <p className="text-gray-800 font-medium">{code.chapter}</p>
+            <div className="p-3 rounded-lg bg-white/5 border border-white/5">
+              <span className="text-xs text-white/40">Chapter</span>
+              <p className="text-white/80 font-medium mt-1">{code.chapter}</p>
             </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-1">Level</h3>
-              <p className="text-gray-800 font-medium">{code.code.length}-digit</p>
+            <div className="p-3 rounded-lg bg-white/5 border border-white/5">
+              <span className="text-xs text-white/40">Level</span>
+              <p className="text-white/80 font-medium mt-1">{code.code.length}-digit</p>
             </div>
           </div>
 
-          {/* Tariff Rates */}
+          {/* Tariff */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-3">Tarif Bea Masuk</h3>
-
+            <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">Tariff Rates</h3>
             {loading ? (
-              <div className="text-gray-400 text-sm animate-pulse">Loading tariff data...</div>
-            ) : error ? (
-              <div className="text-red-500 text-sm bg-red-50 rounded-lg p-3">
-                {error}
-              </div>
+              <div className="text-white/30 text-sm animate-pulse">Loading...</div>
             ) : tariff ? (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2">
                 <TariffItem label="BM MFN" value={tariff.bm_mfn} />
                 <TariffItem label="PPN" value={tariff.ppn} defaultValue={11} />
                 <TariffItem label="PPh API" value={tariff.pph_api} />
                 <TariffItem label="PPh Non-API" value={tariff.pph_non_api} />
                 {tariff.bm_atiga !== null && <TariffItem label="ATIGA" value={tariff.bm_atiga} />}
                 {tariff.bm_acfta !== null && <TariffItem label="ACFTA" value={tariff.bm_acfta} />}
-                {tariff.bm_rcep !== null && <TariffItem label="RCEP" value={tariff.bm_rcep} />}
               </div>
             ) : (
-              <div className="text-gray-400 text-sm bg-gray-50 rounded-lg p-3">
-                Data tarif belum tersedia untuk kode ini
-              </div>
+              <p className="text-white/30 text-sm">No tariff data available</p>
             )}
           </div>
 
-          {/* External Links */}
-          <div className="pt-4 border-t border-gray-100">
+          {/* Link */}
+          <div className="pt-4 border-t border-white/5">
             <a
               href={`https://www.insw.go.id/intr/commodity-detail?code=${code.code}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm"
+              className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
             >
-              <ExternalLink className="h-4 w-4" />
-              Lihat di INSW
+              <ExternalLink className="w-4 h-4" />
+              View on INSW
             </a>
           </div>
         </div>
@@ -193,27 +157,24 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
 
 function TariffItem({ label, value, defaultValue }: { label: string; value: number | null; defaultValue?: number }) {
   const displayValue = value ?? defaultValue
-
-  if (displayValue === null || displayValue === undefined) {
-    return null
-  }
+  if (displayValue === null || displayValue === undefined) return null
 
   const isZero = displayValue === 0
 
   return (
     <div className={cn(
-      "rounded-xl px-3 py-2.5 border transition-colors",
+      "px-3 py-2 rounded-lg border",
       isZero
-        ? "bg-green-50 border-green-200"
-        : "bg-gray-50 border-gray-100"
+        ? "bg-emerald-500/10 border-emerald-500/20"
+        : "bg-white/5 border-white/5"
     )}>
-      <span className="text-xs text-gray-500 font-medium">{label}</span>
-      <span className={cn(
-        "block text-lg font-bold",
-        isZero ? "text-green-600" : "text-gray-800"
+      <span className="text-xs text-white/40">{label}</span>
+      <p className={cn(
+        "font-semibold mt-0.5",
+        isZero ? "text-emerald-400" : "text-white/80"
       )}>
         {displayValue}%
-      </span>
+      </p>
     </div>
   )
 }
