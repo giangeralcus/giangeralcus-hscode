@@ -14,9 +14,11 @@ export function SearchResults({ results, query, onSelectCode }: SearchResultsPro
 
   const handleCopy = async (code: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    await copyToClipboard(code)
-    setCopiedCode(code)
-    setTimeout(() => setCopiedCode(null), 2000)
+    const success = await copyToClipboard(code)
+    if (success) {
+      setCopiedCode(code)
+      setTimeout(() => setCopiedCode(null), 2000)
+    }
   }
 
   if (results.length === 0 && query.length >= 2) {

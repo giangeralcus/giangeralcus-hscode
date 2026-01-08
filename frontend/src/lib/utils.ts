@@ -17,6 +17,12 @@ export function formatHSCode(code: string): string {
   return clean
 }
 
-export function copyToClipboard(text: string): Promise<void> {
-  return navigator.clipboard.writeText(text)
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (err) {
+    console.error('Failed to copy to clipboard:', err)
+    return false
+  }
 }

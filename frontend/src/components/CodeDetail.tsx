@@ -1,5 +1,5 @@
 import { X, Copy, Check, ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { cn, copyToClipboard } from '../lib/utils'
 import type { HSCodeResult } from '../hooks/useHSSearch'
@@ -23,20 +23,39 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   const [tariff, setTariff] = useState<TariffData | null>(null)
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Handle Escape key
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+    }
+  }, [onClose])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
 
   useEffect(() => {
     const fetchTariff = async () => {
       setLoading(true)
+      setError(null)
       try {
-        const { data } = await supabase
+        const { data, error: fetchError } = await supabase
           .from('hs_tariffs')
           .select('bm_mfn, ppn, pph_api, pph_non_api, bm_atiga, bm_acfta, bm_rcep')
           .eq('hs_code', code.code)
           .single()
 
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          // PGRST116 = no rows returned (not an error for us)
+          throw fetchError
+        }
         setTariff(data)
       } catch (err) {
-        console.log('No tariff data found')
+        console.error('Failed to fetch tariff:', err)
+        setError('Gagal memuat data tarif')
       } finally {
         setLoading(false)
       }
@@ -46,18 +65,32 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   }, [code.code])
 
   const handleCopy = async () => {
-    await copyToClipboard(code.code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    const success = await copyToClipboard(code.code)
+    if (success) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose()
+    }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
       <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-2xl font-bold text-blue-600">
+            <span id="modal-title" className="font-mono text-2xl font-bold text-blue-600">
               {code.code_formatted || code.code}
             </span>
             <button
@@ -68,6 +101,7 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
                 copied ? "text-green-500" : "text-gray-400 hover:text-gray-600"
               )}
               title="Copy HS code"
+              aria-label={copied ? "Copied!" : "Copy HS code"}
             >
               {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
             </button>
@@ -75,6 +109,7 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
           <button
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close modal"
           >
             <X className="h-5 w-5" />
           </button>
@@ -112,7 +147,11 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
             <h3 className="text-sm font-medium text-gray-500 mb-3">Tarif Bea Masuk</h3>
 
             {loading ? (
-              <div className="text-gray-400 text-sm">Loading tariff data...</div>
+              <div className="text-gray-400 text-sm animate-pulse">Loading tariff data...</div>
+            ) : error ? (
+              <div className="text-red-500 text-sm bg-red-50 rounded-lg p-3">
+                {error}
+              </div>
             ) : tariff ? (
               <div className="grid grid-cols-2 gap-3">
                 <TariffItem label="BM MFN" value={tariff.bm_mfn} />
