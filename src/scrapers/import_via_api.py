@@ -304,8 +304,16 @@ def main():
 
 
 if __name__ == "__main__":
-    # Set service key if not in environment
+    # Service key must be set via environment variable
+    # Run: export SUPABASE_SERVICE_KEY=your_key_here
+    # Or create a .env file with SUPABASE_SERVICE_KEY=your_key_here
+
     if not SUPABASE_KEY:
-        SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF3d3pteGVoam5qdmpmY2Z2cHltIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODYxMjMwMSwiZXhwIjoyMDY0MTg4MzAxfQ.r6gAf4lcPvBGKQkM9iPicCdizU6CGSb5j6B57Gr-gOM"
+        print("ERROR: SUPABASE_SERVICE_KEY environment variable not set")
+        print("Set it before running:")
+        print("  export SUPABASE_SERVICE_KEY=your_service_key_here")
+        print("Or create a .env file in the project root")
+        import sys
+        sys.exit(1)
 
     main()
