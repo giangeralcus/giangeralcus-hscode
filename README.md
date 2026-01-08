@@ -29,6 +29,7 @@ hs_lartas        → Larangan & Pembatasan
 
 ## Tech Stack
 
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
 - **API**: Supabase REST / Edge Functions
 - **Data Source**: BTKI 2022, Bea Cukai Indonesia
@@ -52,7 +53,25 @@ npx supabase db push
 python src/scrapers/import_hs_codes.py
 ```
 
-### 3. Query Data
+### 3. Run Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env
+# Edit .env dengan Supabase credentials
+
+# Run development server
+npm run dev
+```
+
+Buka http://localhost:5173 di browser.
+
+### 4. Query Data (SQL)
 
 ```sql
 -- Cari HS code by keyword
@@ -78,14 +97,18 @@ GET /rest/v1/hs_lartas?hs_code=eq.64041100
 
 ```
 hs-code-indonesia/
+├── frontend/             # React frontend app
+│   ├── src/
+│   │   ├── components/   # React components
+│   │   ├── hooks/        # Custom hooks
+│   │   └── lib/          # Utilities
+│   └── package.json
 ├── supabase/
-│   └── migrations/        # Database migrations
+│   └── migrations/       # Database migrations
 ├── src/
-│   ├── api/              # API handlers
-│   ├── scrapers/         # Data import scripts
-│   └── utils/            # Utility functions
+│   └── scrapers/         # Data import scripts
 ├── data/                 # CSV data files
-└── docs/                 # Documentation
+└── README.md
 ```
 
 ## Data Sources
