@@ -1,4 +1,4 @@
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, Clock, Hash } from 'lucide-react'
 import type { RecentSearch } from '../hooks/useRecentSearches'
 import { cn } from '../lib/utils'
 
@@ -19,40 +19,74 @@ export function RecentSearches({ searches, onSelect, onRemove, onClearAll }: Rec
           key={search.query + search.timestamp}
           onClick={() => onSelect(search.query)}
           className={cn(
-            "group flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer",
-            "bg-white/[0.03] border border-white/5",
-            "hover:bg-white/[0.06] hover:border-white/10 transition-all"
+            "group relative flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl cursor-pointer",
+            "bg-slate-800/30 backdrop-blur-sm",
+            "border border-white/5",
+            "transition-all duration-300",
+            "hover:bg-slate-800/50 hover:border-cyan-500/20",
+            "hover:shadow-lg hover:shadow-cyan-500/5"
           )}
         >
-          <div className="flex items-center gap-3">
-            <span className="text-white/70 group-hover:text-white transition-colors">
-              {search.query}
-            </span>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-white/30 group-hover:text-cyan-400/70 transition-colors" />
+            </div>
+            <div className="min-w-0">
+              <span className="block text-white/70 group-hover:text-white transition-colors font-medium truncate">
+                {search.query}
+              </span>
+              {search.topResultDescription && (
+                <span className="block text-xs text-white/30 truncate mt-0.5">
+                  {search.topResultDescription}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
             {search.topResultCode && (
-              <span className="text-xs font-mono text-cyan-400/60 bg-cyan-400/10 px-2 py-0.5 rounded">
+              <span className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1 rounded-lg",
+                "text-xs font-mono font-medium",
+                "bg-cyan-500/10 text-cyan-400/80 border border-cyan-500/20"
+              )}>
+                <Hash className="w-3 h-3" />
                 {search.topResultCode}
               </span>
             )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onRemove(search.query)
+              }}
+              className={cn(
+                "p-1.5 rounded-lg",
+                "opacity-0 group-hover:opacity-100",
+                "text-white/30 hover:text-rose-400 hover:bg-rose-500/10",
+                "transition-all duration-200"
+              )}
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onRemove(search.query)
-            }}
-            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-white/10 text-white/30 hover:text-white/60 transition-all"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
         </div>
       ))}
 
-      <button
-        onClick={onClearAll}
-        className="flex items-center gap-1.5 text-xs text-white/30 hover:text-red-400 transition-colors mt-3 px-1"
-      >
-        <Trash2 className="w-3 h-3" />
-        Hapus semua
-      </button>
+      <div className="pt-2">
+        <button
+          onClick={onClearAll}
+          className={cn(
+            "flex items-center gap-2 px-3 py-2 rounded-lg",
+            "text-xs font-medium",
+            "text-white/30 hover:text-rose-400",
+            "hover:bg-rose-500/10",
+            "transition-all duration-200"
+          )}
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          Hapus Semua Riwayat
+        </button>
+      </div>
     </div>
   )
 }
