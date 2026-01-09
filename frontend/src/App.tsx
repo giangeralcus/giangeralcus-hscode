@@ -77,7 +77,7 @@ function App() {
           <div className="w-full">
             {/* Brand Header */}
             <div className={cn(
-              "text-center mb-8 transition-all duration-500",
+              "flex flex-col items-center mb-8 transition-all duration-500",
               query ? "mb-6" : "mb-10"
             )}>
               {/* Logo Mark */}
@@ -89,7 +89,7 @@ function App() {
 
               {/* Title */}
               <h1 className={cn(
-                "font-bold tracking-tight transition-all duration-500",
+                "font-bold tracking-tight transition-all duration-500 text-center",
                 query ? "text-2xl sm:text-3xl" : "text-4xl sm:text-5xl"
               )}>
                 <span className="bg-gradient-to-r from-red-400 to-rose-500 bg-clip-text text-transparent">
@@ -98,7 +98,7 @@ function App() {
                 <span className="text-white">Geralcus</span>
               </h1>
               <h2 className={cn(
-                "font-bold tracking-tight transition-all duration-500",
+                "font-bold tracking-tight transition-all duration-500 text-center",
                 query ? "text-2xl sm:text-3xl mt-1" : "text-4xl sm:text-5xl mt-2"
               )}>
                 <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
@@ -108,7 +108,7 @@ function App() {
 
               {/* Tagline */}
               {!query && (
-                <p className="text-white/50 text-sm mt-4 max-w-md mx-auto leading-relaxed text-center">
+                <p className="w-full text-center text-white/50 text-sm mt-4 leading-relaxed">
                   Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia dengan cepat dan akurat
                 </p>
               )}
