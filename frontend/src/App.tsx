@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Search, Box, History } from 'lucide-react'
+import { History } from 'lucide-react'
 import './index.css'
 import { HSCodeSearch } from './components/HSCodeSearch'
 import { SearchResults } from './components/SearchResults'

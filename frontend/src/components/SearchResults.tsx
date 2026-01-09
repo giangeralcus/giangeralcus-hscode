@@ -99,11 +99,6 @@ export function SearchResults({ results, query, isLoading = false, onSelectCode 
                       <Copy className="w-3.5 h-3.5" />
                     )}
                   </button>
-                  {result.level && (
-                    <span className="text-[10px] text-white/30 px-1.5 py-0.5 rounded bg-white/5">
-                      {result.level}-digit
-                    </span>
-                  )}
                 </div>
 
                 {/* Description */}

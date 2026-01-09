@@ -1,4 +1,4 @@
-import { Search, X, Loader2 } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { cn } from '../lib/utils'
 
 interface HSCodeSearchProps {
