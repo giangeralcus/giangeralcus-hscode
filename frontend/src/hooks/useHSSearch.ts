@@ -8,6 +8,8 @@ export interface HSCodeResult {
   description_en: string | null
   chapter: string
   similarity: number
+  bm_mfn?: number | null
+  ppn?: number | null
 }
 
 interface UseHSSearchReturn {
@@ -38,6 +40,8 @@ export function useHSSearch(): UseHSSearchReturn {
       const { data, error: searchError } = await supabase
         .rpc('search_hs_codes', { search_term: query, limit_count: 50 })
 
+      let searchResults: HSCodeResult[] = []
+
       if (searchError) {
         // Fallback to direct query if function doesn't exist
         // Sanitize query to prevent SQL injection
@@ -51,13 +55,37 @@ export function useHSSearch(): UseHSSearchReturn {
 
         if (fallbackError) throw fallbackError
 
-        setResults((fallbackData || []).map(item => ({
+        searchResults = (fallbackData || []).map(item => ({
           ...item,
           similarity: 0
-        })))
+        }))
       } else {
-        setResults(data || [])
+        searchResults = data || []
       }
+
+      // Fetch tariff data for search results
+      if (searchResults.length > 0) {
+        const codes = searchResults.map(r => r.code)
+        const { data: tariffData } = await supabase
+          .from('hs_tariffs')
+          .select('hs_code, bm_mfn, ppn')
+          .in('hs_code', codes)
+
+        // Merge tariff data with results
+        if (tariffData) {
+          const tariffMap = new Map(tariffData.map(t => [t.hs_code, t]))
+          searchResults = searchResults.map(result => {
+            const tariff = tariffMap.get(result.code)
+            return {
+              ...result,
+              bm_mfn: tariff?.bm_mfn ?? null,
+              ppn: tariff?.ppn ?? null
+            }
+          })
+        }
+      }
+
+      setResults(searchResults)
     } catch (err) {
       console.error('Search error:', err)
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan saat mencari')

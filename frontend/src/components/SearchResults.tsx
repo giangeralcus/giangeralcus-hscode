@@ -80,25 +80,38 @@ export function SearchResults({ results, query, isLoading = false, onSelectCode 
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                {/* Code */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-mono text-cyan-400 font-medium">
-                    {result.code_formatted || result.code}
-                  </span>
-                  <button
-                    onClick={(e) => handleCopy(result.code, e)}
-                    className={cn(
-                      "p-1 rounded transition-all",
-                      "text-white/20 hover:text-white/60 hover:bg-white/10",
-                      copiedCode === result.code && "text-emerald-400"
-                    )}
-                  >
-                    {copiedCode === result.code ? (
-                      <Check className="w-3.5 h-3.5" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
+                {/* Code & Tariff */}
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-cyan-400 font-medium">
+                      {result.code_formatted || result.code}
+                    </span>
+                    <button
+                      onClick={(e) => handleCopy(result.code, e)}
+                      className={cn(
+                        "p-1 rounded transition-all",
+                        "text-white/20 hover:text-white/60 hover:bg-white/10",
+                        copiedCode === result.code && "text-emerald-400"
+                      )}
+                    >
+                      {copiedCode === result.code ? (
+                        <Check className="w-3.5 h-3.5" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
+                  {/* Tariff Badge */}
+                  {result.bm_mfn !== undefined && result.bm_mfn !== null && (
+                    <span className={cn(
+                      "text-xs font-medium px-2 py-0.5 rounded-full",
+                      result.bm_mfn === 0
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-amber-500/20 text-amber-400"
+                    )}>
+                      BM {result.bm_mfn}%
+                    </span>
+                  )}
                 </div>
 
                 {/* Description */}
