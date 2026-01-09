@@ -72,11 +72,11 @@ export function RecentSearches({ searches, onSelect, onRemove, onClearAll }: Rec
         </div>
       ))}
 
-      <div className="pt-2">
+      <div className="pt-3 flex justify-center">
         <button
           onClick={onClearAll}
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg",
+            "flex items-center gap-2 px-4 py-2 rounded-lg",
             "text-xs font-medium",
             "text-white/30 hover:text-rose-400",
             "hover:bg-rose-500/10",

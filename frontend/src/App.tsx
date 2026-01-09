@@ -193,7 +193,7 @@ function App() {
           {/* Recent Searches */}
           {!query && recentSearches.length > 0 && (
             <div className="w-full mt-12">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center justify-center gap-2 mb-4">
                 <History className="w-4 h-4 text-white/30" />
                 <span className="text-xs font-semibold text-white/30 uppercase tracking-wider">
                   Pencarian Terakhir
