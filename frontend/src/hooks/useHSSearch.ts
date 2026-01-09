@@ -10,6 +10,7 @@ export interface HSCodeResult {
   similarity: number
   bm_mfn?: number | null
   ppn?: number | null
+  has_lartas?: boolean
 }
 
 interface UseHSSearchReturn {
@@ -63,26 +64,49 @@ export function useHSSearch(): UseHSSearchReturn {
         searchResults = data || []
       }
 
-      // Fetch tariff data for search results
+      // Fetch tariff and lartas data for search results
       if (searchResults.length > 0) {
         const codes = searchResults.map(r => r.code)
-        const { data: tariffData } = await supabase
-          .from('hs_tariffs')
-          .select('hs_code, bm_mfn, ppn')
-          .in('hs_code', codes)
 
-        // Merge tariff data with results
-        if (tariffData) {
-          const tariffMap = new Map(tariffData.map(t => [t.hs_code, t]))
-          searchResults = searchResults.map(result => {
-            const tariff = tariffMap.get(result.code)
-            return {
-              ...result,
-              bm_mfn: tariff?.bm_mfn ?? null,
-              ppn: tariff?.ppn ?? null
-            }
-          })
+        // Fetch tariff data (fail gracefully)
+        let tariffMap = new Map<string, { bm_mfn: number | null; ppn: number | null }>()
+        try {
+          const { data: tariffData } = await supabase
+            .from('hs_tariffs')
+            .select('hs_code, bm_mfn, ppn')
+            .in('hs_code', codes)
+          if (tariffData) {
+            tariffMap = new Map(tariffData.map(t => [t.hs_code, t]))
+          }
+        } catch {
+          // Tariff table may not exist, continue without tariff data
         }
+
+        // Fetch lartas codes (fail gracefully - table may not exist yet)
+        let lartasSet = new Set<string>()
+        try {
+          const { data: lartasData } = await supabase
+            .from('hs_lartas')
+            .select('hs_code')
+            .in('hs_code', codes)
+            .eq('is_active', true)
+          if (lartasData) {
+            lartasSet = new Set(lartasData.map(l => l.hs_code))
+          }
+        } catch {
+          // Lartas table may not exist, continue without lartas data
+        }
+
+        // Merge data with results
+        searchResults = searchResults.map(result => {
+          const tariff = tariffMap.get(result.code)
+          return {
+            ...result,
+            bm_mfn: tariff?.bm_mfn ?? null,
+            ppn: tariff?.ppn ?? null,
+            has_lartas: lartasSet.has(result.code)
+          }
+        })
       }
 
       setResults(searchResults)

@@ -1,4 +1,4 @@
-import { X, Copy, Check, ExternalLink } from 'lucide-react'
+import { X, Copy, Check, ExternalLink, AlertTriangle, FileText } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { cn, copyToClipboard } from '../lib/utils'
@@ -14,6 +14,18 @@ interface TariffData {
   bm_rcep: number | null
 }
 
+interface LartasData {
+  id: number
+  lartas_type: string
+  trade_type: string
+  agency_code: string | null
+  agency_name: string | null
+  requirement: string
+  document_type: string | null
+  permit_name: string | null
+  regulation_number: string | null
+}
+
 interface CodeDetailProps {
   code: HSCodeResult
   onClose: () => void
@@ -21,6 +33,7 @@ interface CodeDetailProps {
 
 export function CodeDetail({ code, onClose }: CodeDetailProps) {
   const [tariff, setTariff] = useState<TariffData | null>(null)
+  const [lartas, setLartas] = useState<LartasData[]>([])
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -34,22 +47,36 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
   }, [handleKeyDown])
 
   useEffect(() => {
-    const fetchTariff = async () => {
+    const fetchData = async () => {
       setLoading(true)
+
+      // Fetch tariff data (fail gracefully)
       try {
         const { data } = await supabase
           .from('hs_tariffs')
           .select('bm_mfn, ppn, pph_api, pph_non_api, bm_atiga, bm_acfta, bm_rcep')
           .eq('hs_code', code.code)
           .single()
-        setTariff(data)
+        if (data) setTariff(data)
       } catch {
         // No tariff data available
-      } finally {
-        setLoading(false)
       }
+
+      // Fetch lartas data (fail gracefully - table may not exist)
+      try {
+        const { data } = await supabase
+          .from('hs_lartas')
+          .select('id, lartas_type, trade_type, agency_code, agency_name, requirement, document_type, permit_name, regulation_number')
+          .eq('hs_code', code.code)
+          .eq('is_active', true)
+        if (data) setLartas(data)
+      } catch {
+        // No lartas data available or table doesn't exist
+      }
+
+      setLoading(false)
     }
-    fetchTariff()
+    fetchData()
   }, [code.code])
 
   const handleCopy = async () => {
@@ -134,6 +161,67 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
               </div>
             ) : (
               <p className="text-white/30 text-sm">No tariff data available</p>
+            )}
+          </div>
+
+          {/* Lartas */}
+          <div>
+            <h3 className="text-xs font-medium text-white/40 uppercase tracking-wider mb-3">
+              Lartas (Restrictions)
+            </h3>
+            {loading ? (
+              <div className="text-white/30 text-sm animate-pulse">Loading...</div>
+            ) : lartas.length > 0 ? (
+              <div className="space-y-3">
+                {lartas.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/20"
+                  >
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={cn(
+                            "text-xs font-medium px-2 py-0.5 rounded",
+                            item.lartas_type === 'LARANGAN'
+                              ? "bg-red-500/30 text-red-300"
+                              : "bg-amber-500/30 text-amber-300"
+                          )}>
+                            {item.lartas_type}
+                          </span>
+                          <span className="text-xs text-white/50">
+                            {item.trade_type}
+                          </span>
+                          {item.agency_name && (
+                            <span className="text-xs text-cyan-400">
+                              {item.agency_code || item.agency_name}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-white/70 mt-2">
+                          {item.requirement}
+                        </p>
+                        {(item.permit_name || item.document_type) && (
+                          <div className="flex items-center gap-1.5 mt-2 text-xs text-white/50">
+                            <FileText className="w-3 h-3" />
+                            {item.permit_name || item.document_type}
+                          </div>
+                        )}
+                        {item.regulation_number && (
+                          <p className="text-xs text-white/40 mt-1">
+                            Ref: {item.regulation_number}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                <p className="text-sm text-emerald-400">No restrictions (Bebas Lartas)</p>
+              </div>
             )}
           </div>
 

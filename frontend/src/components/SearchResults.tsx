@@ -1,4 +1,4 @@
-import { Copy, Check, ArrowRight } from 'lucide-react'
+import { Copy, Check, ArrowRight, AlertTriangle } from 'lucide-react'
 import { useState } from 'react'
 import type { HSCodeResult } from '../hooks/useHSSearch'
 import { cn, copyToClipboard } from '../lib/utils'
@@ -101,17 +101,27 @@ export function SearchResults({ results, query, isLoading = false, onSelectCode 
                       )}
                     </button>
                   </div>
-                  {/* Tariff Badge */}
-                  {result.bm_mfn !== undefined && result.bm_mfn !== null && (
-                    <span className={cn(
-                      "text-xs font-medium px-2 py-0.5 rounded-full",
-                      result.bm_mfn === 0
-                        ? "bg-emerald-500/20 text-emerald-400"
-                        : "bg-amber-500/20 text-amber-400"
-                    )}>
-                      BM {result.bm_mfn}%
-                    </span>
-                  )}
+                  {/* Badges */}
+                  <div className="flex items-center gap-1.5">
+                    {/* Lartas Badge */}
+                    {result.has_lartas && (
+                      <span className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-red-500/20 text-red-400">
+                        <AlertTriangle className="w-3 h-3" />
+                        Lartas
+                      </span>
+                    )}
+                    {/* Tariff Badge */}
+                    {result.bm_mfn !== undefined && result.bm_mfn !== null && (
+                      <span className={cn(
+                        "text-xs font-medium px-2 py-0.5 rounded-full",
+                        result.bm_mfn === 0
+                          ? "bg-emerald-500/20 text-emerald-400"
+                          : "bg-amber-500/20 text-amber-400"
+                      )}>
+                        BM {result.bm_mfn}%
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Description */}
