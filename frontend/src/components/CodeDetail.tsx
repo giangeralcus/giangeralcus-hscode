@@ -225,17 +225,20 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
             )}
           </div>
 
-          {/* Link */}
-          <div className="pt-4 border-t border-white/5">
+          {/* External Links */}
+          <div className="pt-4 border-t border-white/5 space-y-2">
             <a
-              href={`https://www.insw.go.id/intr/commodity-detail?code=${code.code}`}
+              href={`https://insw.go.id/intr`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              View on INSW
+              Search on INSW
             </a>
+            <p className="text-xs text-white/30">
+              Search: <span className="font-mono text-white/50">{code.code}</span>
+            </p>
           </div>
         </div>
       </div>
