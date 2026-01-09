@@ -7,7 +7,8 @@ Tool sederhana untuk kegiatan customs clearance sehari-hari.
 ## Fitur
 
 - Cari HS code berdasarkan nama barang
-- Database 14,999 kode HS Indonesia
+- Database 11,552 kode HS 8-digit Indonesia (E-BTKI 2022)
+- 11,194 kode dengan tarif (BM MFN, PPN)
 - Deskripsi bahasa Indonesia & Inggris
 - History pencarian tersimpan
 - Dark mode UI
