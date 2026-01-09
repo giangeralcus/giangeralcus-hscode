@@ -109,9 +109,9 @@ python src/scrapers/import_btki_2022.py --cloud
 - [x] Extract data from E-BTKI CHM file
 - [x] Indonesian language descriptions
 - [x] Import tariff rates (BM MFN, PPN)
+- [x] Display tariff rates in UI (search results + detail modal)
 
 ## Pending/Future
-- [ ] Display tariff rates in UI (data ready in DB)
 - [ ] Add Lartas info display
 - [ ] FTA rates (ATIGA, ACFTA, etc.)
 - [ ] Export to PDF/Excel
