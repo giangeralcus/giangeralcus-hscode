@@ -108,7 +108,7 @@ function App() {
 
               {/* Tagline */}
               {!query && (
-                <p className="text-white/50 text-sm mt-4 max-w-md mx-auto leading-relaxed">
+                <p className="text-white/50 text-sm mt-4 max-w-md mx-auto leading-relaxed text-center">
                   Temukan klasifikasi tarif untuk barang impor dan ekspor Indonesia dengan cepat dan akurat
                 </p>
               )}
