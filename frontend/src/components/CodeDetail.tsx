@@ -50,17 +50,29 @@ export function CodeDetail({ code, onClose }: CodeDetailProps) {
     const fetchData = async () => {
       setLoading(true)
 
+      // Fetch tariff data
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('hs_tariffs')
           .select('bm_mfn, ppn, pph_api, pph_non_api, bm_atiga, bm_acfta, bm_rcep')
           .eq('hs_code', code.code)
           .single()
-        if (data) setTariff(data)
-      } catch {
-        // No tariff data available
+
+        if (error) {
+          // PGRST116 means no rows found - this is expected for some codes
+          if (error.code !== 'PGRST116') {
+            console.warn(`Failed to fetch tariff for ${code.code}:`, error.message)
+          }
+          setTariff(null)
+        } else {
+          setTariff(data)
+        }
+      } catch (err) {
+        console.error(`Unexpected error fetching tariff for ${code.code}:`, err)
+        setTariff(null)
       }
 
+      // Fetch lartas data
       try {
         const { data } = await supabase
           .from('hs_lartas')

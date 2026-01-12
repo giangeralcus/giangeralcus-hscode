@@ -5,13 +5,17 @@ import { HSCodeSearch } from './components/HSCodeSearch'
 import { SearchResults } from './components/SearchResults'
 import { CodeDetail } from './components/CodeDetail'
 import { RecentSearches } from './components/RecentSearches'
+import { CodeAssistant } from './components/CodeAssistant'
 import { useHSSearch, type HSCodeResult } from './hooks/useHSSearch'
 import { useRecentSearches } from './hooks/useRecentSearches'
 import { cn } from './lib/utils'
 
+type TabMode = 'search' | 'ai'
+
 function App() {
   const [query, setQuery] = useState('')
   const [selectedCode, setSelectedCode] = useState<HSCodeResult | null>(null)
+  const [activeTab, setActiveTab] = useState<TabMode>('search')
 
   const { results, isLoading, error, search, clearResults } = useHSSearch()
   const { recentSearches, addSearch, removeSearch, clearAll } = useRecentSearches()
@@ -34,6 +38,13 @@ function App() {
   const handleRecentSearch = useCallback((recentQuery: string) => {
     setQuery(recentQuery)
     search(recentQuery)
+  }, [search])
+
+  // Handle AI classification result - search for the selected HS code
+  const handleAISelectCode = useCallback((code: string) => {
+    setActiveTab('search')
+    setQuery(code)
+    search(code)
   }, [search])
 
   const quickSearchItems = [
@@ -124,8 +135,38 @@ function App() {
               />
             </div>
 
-            {/* Quick Search Chips */}
+            {/* Tab Switcher - Only when no query */}
             {!query && (
+              <div className="w-full flex items-center justify-center gap-2 mt-6">
+                <button
+                  onClick={() => setActiveTab('search')}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                    activeTab === 'search'
+                      ? "bg-white/10 text-white border border-white/20"
+                      : "text-white/50 hover:text-white/70 hover:bg-white/5"
+                  )}
+                >
+                  <Search className="w-4 h-4" />
+                  Cari Kode
+                </button>
+                <button
+                  onClick={() => setActiveTab('ai')}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all",
+                    activeTab === 'ai'
+                      ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-400 border border-cyan-500/30"
+                      : "text-white/50 hover:text-cyan-400/70 hover:bg-cyan-500/5"
+                  )}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  AI Klasifikasi
+                </button>
+              </div>
+            )}
+
+            {/* Quick Search Chips - Only when search tab and no query */}
+            {!query && activeTab === 'search' && (
               <div className="w-full mt-6">
                 <div className="flex items-center justify-center gap-2 mb-3">
                   <Sparkles className="w-3.5 h-3.5 text-white/30" />
@@ -155,6 +196,13 @@ function App() {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* AI Classification - Only when AI tab and no query */}
+            {!query && activeTab === 'ai' && (
+              <div className="w-full mt-6">
+                <CodeAssistant onSelectCode={handleAISelectCode} />
               </div>
             )}
           </div>
@@ -191,7 +239,7 @@ function App() {
           )}
 
           {/* Recent Searches */}
-          {!query && recentSearches.length > 0 && (
+          {!query && recentSearches.length > 0 && activeTab === 'search' && (
             <div className="w-full mt-12">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <History className="w-4 h-4 text-white/30" />

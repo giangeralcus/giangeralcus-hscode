@@ -7,6 +7,7 @@ export interface HSCodeResult {
   description_id: string
   description_en: string | null
   chapter: string
+  level?: number
   similarity: number
   bm_mfn?: number | null
   ppn?: number | null
@@ -45,19 +46,24 @@ export function useHSSearch(): UseHSSearchReturn {
 
       if (searchError) {
         // Fallback to direct query if function doesn't exist
-        // Sanitize query to prevent SQL injection
-        const sanitizedQuery = query.replace(/[%_\\]/g, '\\$&')
+        // Properly escape special ILIKE characters: %, _, and \
+        const escapedQuery = query
+          .replace(/\\/g, '\\\\')  // Escape backslashes first
+          .replace(/%/g, '\\%')    // Escape percent signs
+          .replace(/_/g, '\\_')    // Escape underscores
 
         const { data: fallbackData, error: fallbackError } = await supabase
           .from('hs_codes')
-          .select('code, code_formatted, description_id, description_en, chapter')
-          .or(`code.ilike.%${sanitizedQuery}%,description_id.ilike.%${sanitizedQuery}%,description_en.ilike.%${sanitizedQuery}%`)
+          .select('code, code_formatted, description_id, description_en, chapter, level')
+          .or(`code.ilike.%${escapedQuery}%,description_id.ilike.%${escapedQuery}%,description_en.ilike.%${escapedQuery}%`)
+          .order('code')
           .limit(50)
 
         if (fallbackError) throw fallbackError
 
         searchResults = (fallbackData || []).map(item => ({
           ...item,
+          level: item.level ?? item.code.length,
           similarity: 0
         }))
       } else {
