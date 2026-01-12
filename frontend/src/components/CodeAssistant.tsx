@@ -11,6 +11,7 @@ export function CodeAssistant({ onSelectCode }: CodeAssistantProps) {
   const [input, setInput] = useState('')
   const [results, setResults] = useState<ClassificationResult[]>([])
   const [keywords, setKeywords] = useState<string[]>([])
+  const [warning, setWarning] = useState<string | null>(null)
   const [copiedCode, setCopiedCode] = useState<string | null>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -27,10 +28,14 @@ export function CodeAssistant({ onSelectCode }: CodeAssistantProps) {
     e.preventDefault()
     if (!input.trim() || isLoading) return
 
+    // Reset warning state
+    setWarning(null)
+
     const result = await classify(input)
     if (result) {
       setResults(result.classifications || [])
       setKeywords(result.keywords || [])
+      setWarning(result.warning || null)
     }
   }
 
@@ -139,6 +144,16 @@ export function CodeAssistant({ onSelectCode }: CodeAssistantProps) {
           <div className="mt-3 flex items-center gap-2 text-red-400 text-sm" role="alert" aria-live="assertive">
             <AlertCircle className="w-4 h-4" aria-hidden="true" />
             {error}
+          </div>
+        )}
+
+        {/* Warning Message (when AI couldn't classify properly) */}
+        {warning && (
+          <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-amber-400 text-sm" role="alert">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <p>{warning}</p>
+            </div>
           </div>
         )}
 

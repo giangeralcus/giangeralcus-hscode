@@ -115,8 +115,19 @@ app.post('/api/classify', async (req, res) => {
     const result = await classifyProduct(description);
 
     if (!result) {
-      return res.status(500).json({
-        error: 'Failed to parse classification result'
+      // Return graceful fallback instead of 500 error
+      console.warn(`Classification returned no result for: "${description.substring(0, 50)}..."`);
+      return res.json({
+        success: false,
+        query: description,
+        language,
+        result: {
+          classifications: [],
+          keywords: description.split(/\s+/).filter(w => w.length > 2),
+          material: null,
+          category: null
+        },
+        warning: 'AI tidak dapat mengklasifikasi produk ini. Coba dengan deskripsi yang lebih spesifik atau gunakan pencarian manual.'
       });
     }
 

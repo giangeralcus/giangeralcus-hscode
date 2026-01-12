@@ -15,6 +15,7 @@ export interface ClassificationResponse {
   keywords: string[]
   material: string | null
   category: string | null
+  warning?: string
 }
 
 interface LLMStatus {
@@ -70,11 +71,17 @@ export function useAIClassify(): UseAIClassifyReturn {
 
       const data = await response.json()
 
-      if (!data.success || !data.result) {
+      if (!data.result) {
         throw new Error('Invalid response from AI')
       }
 
-      return data.result as ClassificationResponse
+      // Include warning if present (when AI couldn't classify properly)
+      const result: ClassificationResponse = {
+        ...data.result,
+        warning: data.warning
+      }
+
+      return result
 
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Terjadi kesalahan'
